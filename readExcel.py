@@ -29,5 +29,3 @@ for i in range(row-2):
 # for adding bootDurations
 for i in range(column-1):
     bootDurations[i] = sheetObj.cell(row, i+2).value
-# print(bootDurations)
-print(2.0 - int(2.0))

@@ -124,7 +124,13 @@ for i in range(len(noOfGamesPerBoot[0])):
             waitTimeArray[i].append(int(waitingTime[i])+1)
     print(waitTimeArray[i])
     print(len(waitTimeArray[i]))
-
+sum = []
+for i in range(noOfBoots):
+    temp = 0
+    for j in range(len(waitTimeArray[i])):
+        temp += waitTimeArray[i][j]
+    sum.append(temp)
+print(sum)
 # # now we have to distribute all gameIds evenly throughout the day
 # # for every boot we will distribute the gameIds evenly
 # gameIdArray = [[] , [] , [] , [] , [] , []]
@@ -189,17 +195,18 @@ for i in range(noOfBoots):  # to change
     finalGameArray.append(makeGameIdArray(
         noOfGamesPerBoot, noOfGameIds, i, sumOfGamesEachBoot[i]))
 
-# for i in range(len(finalGameArray)):
-#     print(finalGameArray[i])
+for i in range(len(finalGameArray)):
+    print(finalGameArray[i])
 
 # datetime object containing current date and time
 dt = date.today()
 time_zero = datetime.combine(
     dt, datetime.min.time()) + relativedelta(minutes=0)
+print(time_zero)
 finalData = [[] for i in range(noOfBoots)]
 for i in range(noOfBoots):
     currentBootTimeStart = datetime.combine(
-        dt, datetime.min.time()) + relativedelta(minutes=i)
+        dt, datetime.min.time())
     timeReqdInMinutes = bootDurations[i]
     prevMatchStartTime = datetime.combine(
         dt, datetime.min.time()) + relativedelta(minutes=0)
@@ -210,6 +217,7 @@ for i in range(noOfBoots):
             waitTime = relativedelta(minutes=0)
         else:
             waitTime = relativedelta(minutes=waitTimeArray[i][j])
+            # print(waitTime)
         matchStartTime = (currentBootTimeStart-time_zero +
                           prevMatchStartTime) + waitTime
         matchEndTime = matchStartTime+relativedelta(minutes=timeReqdInMinutes)
@@ -223,3 +231,5 @@ for i in range(noOfBoots):
         finalData[i].append(currentData)
 
 # print(finalData)
+for i in range(noOfBoots):
+    print(len(finalData[i]))

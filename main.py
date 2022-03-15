@@ -2,7 +2,7 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-from readExcel import gameIds, noOfGamesPerBoot, bootDurations
+from readExcel import gameIds, noOfGamesPerBoot, bootDurations, bootPrice
 
 # to find next empty slot
 
@@ -83,106 +83,15 @@ noOfMinutes = 1440
 firstToSecond = [0 for i in range(noOfBoots)]
 for i in range(len(noOfGamesPerBoot)):
     for j in range(len(noOfGamesPerBoot[i])):
-        # print(noOfGamesPerBoot[i][j])
         noOfGames[j] += noOfGamesPerBoot[i][j]
 # print(noOfGames)
-
-for i in range(len(noOfGames)):
-    waitingTime[i] = 1440.0/noOfGames[i]
-# print(waitingTime)
-
-for i in range(len(noOfGames)):
-    fraction = waitingTime[i] - int(waitingTime[i])
-    fraction = float("{:.5f}".format(fraction))
-    ratio = (1-fraction)/fraction
-    firstWaitingTimeGames[i] = (int)(noOfGames[i]*(ratio)/(ratio+1))
-    secondWaitingTimeGames[i] = noOfGames[i] - firstWaitingTimeGames[i]
-    firstToSecond[i] = firstWaitingTimeGames[i]/secondWaitingTimeGames[i]
-# print(firstWaitingTimeGames)
-# print(secondWaitingTimeGames)
-# print(firstToSecond)
-
-waitTimeArray = [[], [], [], [], [], []]
-for i in range(len(noOfGamesPerBoot[0])):
-    j = 0
-    fracSum = 0.0
-    while j < noOfGames[i]:
-        if(firstToSecond[i] >= 1):
-            for k in range(int(firstToSecond[i])):
-                j += 1
-                waitTimeArray[i].append(int(waitingTime[i]))
-            fracSum += firstToSecond[i] - int(firstToSecond[i])
-            if(fracSum > 1):
-                j += 1
-                if(j > noOfGames[i]):
-                    break
-                waitTimeArray[i].append(int(waitingTime[i]))
-                fracSum -= 1
-            j += 1
-            if(j > noOfGames[i]):
-                break
-            waitTimeArray[i].append(int(waitingTime[i])+1)
-    print(waitTimeArray[i])
-    print(len(waitTimeArray[i]))
-sum = []
+waitTimeArray = [[0, 0] for i in range(noOfBoots)]
 for i in range(noOfBoots):
-    temp = 0
-    for j in range(len(waitTimeArray[i])):
-        temp += waitTimeArray[i][j]
-    sum.append(temp)
-print(sum)
-# # now we have to distribute all gameIds evenly throughout the day
-# # for every boot we will distribute the gameIds evenly
-# gameIdArray = [[] , [] , [] , [] , [] , []]
-# for i in range(len(gameIdArray)):
-#     integerGames = []
-#     fractionalGames = []
-#     for j in range(len(gameNBoots)):
-#         if(j==0) :
-#             integerGames.append(1)
-#             fractionalGames.append(0.0)
-#         else :
-#             integerGames.append(int(gameNBoots[j][i]/gameNBoots[0][i]))
-#             fractionalGames.append(float(gameNBoots[j][i]/gameNBoots[0][i]) - int(gameNBoots[j][i]/gameNBoots[0][i]))
-#     idx = 0
-#     tempFractional = [0.0 , 0.0 , 0.0];
-#     # print(integerGames)
-#     # print(fractionalGames)
-#     for count in range(gameNBoots[0][i]):
-#         for k in range(len(integerGames)):
-#             currentCount = integerGames[k]
-#             tempFractional[k] += fractionalGames[k]
-#             while(currentCount):
-#                 gameIdArray[i].append(k)
-#                 currentCount -= 1
-#         for k in range(len(fractionalGames)):
-#             if(tempFractional[k] >= 1):
-#                 gameIdArray[i].append(k)
-#                 tempFractional[k] -= 1
-#     print(gameIdArray[i])
+    waitTimeArray[i][0] = (1440//noOfGames[i])  # average minutes
+    waitTimeArray[i][1] = int(
+        (1440.0/noOfGames[i] - waitTimeArray[i][0])*60)  # average seconds
 
-
-# function to evenly distribute the games
-
-# def fillingIndices(bootNo, gameNBoots):
-#     gameArray = []
-#     sumOfGames = 0
-#     for i in range(len(gameNBoots)):
-#         sumOfGames += gameNBoots[i][bootNo]
-
-#     for i in range(len(gameNBoots)):
-
-#     return gameArray
-
-
-# def puttingWaitTimeAndGameTogether(waitTimeArray , gameIdArray) :
-#     return {}
-
-# gamesArray = []
-# for i in range(len(waitTimeArray)):
-#     gamesArray.append(fillingIndices(i ,gameNBoots))
-
-# finalData = puttingWaitTimeAndGameTogether(waitTimeArray , gamesArray)
+print(waitTimeArray)
 sumOfGamesEachBoot = [0 for i in range(noOfBoots)]
 for i in range(noOfBoots):
     for j in range(noOfGameIds):
@@ -212,24 +121,22 @@ for i in range(noOfBoots):
         dt, datetime.min.time()) + relativedelta(minutes=0)
     for j in range(noOfGames[i]):
         currentData = []
-        currentData.append(i)
+        currentData.append(bootPrice[i])
         if(j == 0):
-            waitTime = relativedelta(minutes=0)
+            waitTime = relativedelta(minutes=0, seconds=0)
         else:
-            waitTime = relativedelta(minutes=waitTimeArray[i][j])
-            # print(waitTime)
+            waitTime = relativedelta(
+                minutes=waitTimeArray[i][0], seconds=waitTimeArray[i][1])
         matchStartTime = (currentBootTimeStart-time_zero +
                           prevMatchStartTime) + waitTime
         matchEndTime = matchStartTime+relativedelta(minutes=timeReqdInMinutes)
-        mst = matchStartTime.strftime("%Y-%m-%d, %H:%M:%S")
-        met = matchEndTime.strftime("%Y-%m-%d, %H:%M:%S")
+        mst = matchStartTime.strftime("%Y-%m-%d, %I:%M:%S %p")
+        met = matchEndTime.strftime("%Y-%m-%d, %I:%M:%S %p")
         currentData.append(mst)
         currentData.append(met)
-        currentData.append(finalGameArray[i][j])
+        currentData.append(gameIds[finalGameArray[i][j]])
         prevMatchStartTime = matchStartTime
-        print(currentData)
+        # print(currentData)
         finalData[i].append(currentData)
 
-# print(finalData)
-for i in range(noOfBoots):
-    print(len(finalData[i]))
+print(finalData[0])

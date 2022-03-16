@@ -2,9 +2,14 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-from readExcel import gameIds, noOfGamesPerBoot, bootDurations, bootPrice
-
-# to find next empty slot
+from readExcel import inputMainFunc
+from writeExcel import outputMainFunc
+result = inputMainFunc()
+gameIds = result[0]
+noOfGamesPerBoot = result[1]
+bootPrice = result[2]
+bootDurations = result[3]
+# to find next empty slots
 
 
 def findNextEmptySlot(currentGameArray, j, gameSum):
@@ -139,4 +144,4 @@ for i in range(noOfBoots):
         # print(currentData)
         finalData[i].append(currentData)
 
-print(finalData[0])
+outputMainFunc(finalData, noOfBoots, noOfGames)

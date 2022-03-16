@@ -130,8 +130,8 @@ for i in range(noOfBoots):
         matchStartTime = (currentBootTimeStart-time_zero +
                           prevMatchStartTime) + waitTime
         matchEndTime = matchStartTime+relativedelta(minutes=timeReqdInMinutes)
-        mst = matchStartTime.strftime("%Y-%m-%d, %I:%M:%S %p")
-        met = matchEndTime.strftime("%Y-%m-%d, %I:%M:%S %p")
+        mst = matchStartTime.strftime("%Y-%m-%d %I:%M:%S %p")
+        met = matchEndTime.strftime("%Y-%m-%d %I:%M:%S %p")
         currentData.append(mst)
         currentData.append(met)
         currentData.append(gameIds[finalGameArray[i][j]])
